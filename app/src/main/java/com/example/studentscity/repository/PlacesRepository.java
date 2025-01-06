@@ -1,6 +1,7 @@
 package com.example.studentscity.repository;
 
 import android.content.Context;
+import android.app.Application;
 
 import com.example.studentscity.data.AppDatabase;
 import com.example.studentscity.data.dao.PlaceDao;
@@ -8,6 +9,7 @@ import com.example.studentscity.data.dao.ReviewDao;
 import com.example.studentscity.data.entity.PlaceEntity;
 import com.example.studentscity.data.mapper.PlaceMapper;
 import com.example.studentscity.data.mapper.ReviewMapper;
+import com.example.studentscity.data.executor.ExecutorProvider;
 import com.example.studentscity.model.Place;
 import com.example.studentscity.model.PlaceType;
 import com.example.studentscity.model.PendingPlace;
@@ -15,20 +17,21 @@ import com.example.studentscity.model.Review;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 public class PlacesRepository {
     private final PlaceDao placeDao;
     private final ReviewDao reviewDao;
+    private final ExecutorService executor;
 
     public PlacesRepository(Context context) {
         AppDatabase db = AppDatabase.getDatabase(context);
         placeDao = db.placeDao();
         reviewDao = db.reviewDao();
+        executor = ExecutorProvider.getInstance().getDatabaseExecutor();
         
-        // Initialize with sample data if empty
         initializeSampleData();
     }
 
@@ -57,37 +60,36 @@ public class PlacesRepository {
                     "Quiet study spot with free WiFi", 
                     43.7115, -1.0545, PlaceType.LIBRARY));
 
-                // Insert all sample places at once
                 placeDao.insertAll(samplePlaces);
             }
-        }, Executors.newSingleThreadExecutor());
+        }, executor);
     }
 
     public CompletableFuture<List<Place>> getPlaces() {
         return CompletableFuture.supplyAsync(() -> 
             PlaceMapper.toDomainList(placeDao.getAll()),
-            Executors.newSingleThreadExecutor()
+            executor
         );
     }
 
     public CompletableFuture<Place> getPlace(String placeId) {
         return CompletableFuture.supplyAsync(() -> 
             PlaceMapper.toDomainModel(placeDao.getById(placeId)),
-            Executors.newSingleThreadExecutor()
+            executor
         );
     }
 
     public CompletableFuture<List<Place>> getPlacesByType(PlaceType type) {
         return CompletableFuture.supplyAsync(() -> 
             PlaceMapper.toDomainList(placeDao.getByType(type)),
-            Executors.newSingleThreadExecutor()
+            executor
         );
     }
 
     public CompletableFuture<List<Review>> getReviews(String placeId) {
         return CompletableFuture.supplyAsync(() -> 
             ReviewMapper.toDomainList(reviewDao.getForPlace(placeId)),
-            Executors.newSingleThreadExecutor()
+            executor
         );
     }
 
@@ -100,11 +102,10 @@ public class PlacesRepository {
                 e.printStackTrace();
                 return false;
             }
-        }, Executors.newSingleThreadExecutor());
+        }, executor);
     }
 
     public CompletableFuture<Boolean> submitPendingPlace(PendingPlace pendingPlace) {
-        // Convert PendingPlace to Place and save it
         Place place = new Place(
             UUID.randomUUID().toString(),
             pendingPlace.getName(),
@@ -122,6 +123,6 @@ public class PlacesRepository {
                 e.printStackTrace();
                 return false;
             }
-        }, Executors.newSingleThreadExecutor());
+        }, executor);
     }
 } 
