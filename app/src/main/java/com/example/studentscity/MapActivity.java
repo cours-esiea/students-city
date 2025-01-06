@@ -326,6 +326,14 @@ public class MapActivity extends AppCompatActivity {
         placesRecyclerView = findViewById(R.id.placesRecyclerView);
         placesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         placesAdapter = new PlacesAdapter();
+        
+        // Add click listener
+        placesAdapter.setOnPlaceClickListener(place -> {
+            Intent intent = new Intent(this, PlaceDetailsActivity.class);
+            intent.putExtra(PlaceDetailsActivity.EXTRA_PLACE_ID, place.getId());
+            startActivity(intent);
+        });
+        
         placesRecyclerView.setAdapter(placesAdapter);
     }
 

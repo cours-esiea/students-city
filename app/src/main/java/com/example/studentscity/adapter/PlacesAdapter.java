@@ -17,6 +17,16 @@ import java.util.Locale;
 
 public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewHolder> {
     private List<Place> places = new ArrayList<>();
+    private OnPlaceClickListener listener;
+
+    // Add interface for click handling
+    public interface OnPlaceClickListener {
+        void onPlaceClick(Place place);
+    }
+
+    public void setOnPlaceClickListener(OnPlaceClickListener listener) {
+        this.listener = listener;
+    }
 
     @NonNull
     @Override
@@ -42,7 +52,8 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
         notifyDataSetChanged();
     }
 
-    static class PlaceViewHolder extends RecyclerView.ViewHolder {
+    // Update ViewHolder to handle clicks
+    class PlaceViewHolder extends RecyclerView.ViewHolder {
         private final TextView nameText;
         private final TextView descriptionText;
         private final TextView distanceText;
@@ -52,6 +63,14 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.PlaceViewH
             nameText = itemView.findViewById(R.id.placeName);
             descriptionText = itemView.findViewById(R.id.placeDescription);
             distanceText = itemView.findViewById(R.id.placeDistance);
+
+            // Add click listener to the entire item
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onPlaceClick(places.get(position));
+                }
+            });
         }
 
         void bind(Place place) {
