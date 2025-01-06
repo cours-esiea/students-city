@@ -158,10 +158,10 @@ public class MapActivity extends AppCompatActivity {
     private void showPlaceDetailsDialog(Place place) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_place_details, null);
         
-        // Set place details
         TextView nameText = dialogView.findViewById(R.id.placeName);
         TextView descriptionText = dialogView.findViewById(R.id.placeDescription);
         TextView distanceText = dialogView.findViewById(R.id.placeDistance);
+        Button viewDetailsButton = dialogView.findViewById(R.id.viewDetailsButton);
         Button leaveReviewButton = dialogView.findViewById(R.id.leaveReviewButton);
         
         nameText.setText(place.getName());
@@ -182,7 +182,13 @@ public class MapActivity extends AppCompatActivity {
                 .setView(dialogView)
                 .create();
 
-        // Set up the leave review button
+        viewDetailsButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(this, PlaceDetailsActivity.class);
+            intent.putExtra(PlaceDetailsActivity.EXTRA_PLACE_ID, place.getId());
+            startActivity(intent);
+        });
+
         leaveReviewButton.setOnClickListener(v -> {
             dialog.dismiss();
             showAddReviewDialog(place);

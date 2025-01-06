@@ -54,4 +54,26 @@ public class PlacesRepository {
             return true;
         });
     }
+
+    public CompletableFuture<Place> getPlace(String placeId) {
+        return CompletableFuture.supplyAsync(() -> {
+            // TODO: In a real app, this would fetch from a database/API
+            // For now, find the place in our simulated data
+            return getPlaces().join().stream()
+                    .filter(p -> p.getId().equals(placeId))
+                    .findFirst()
+                    .orElse(null);
+        });
+    }
+
+    public CompletableFuture<List<Review>> getReviews(String placeId) {
+        return CompletableFuture.supplyAsync(() -> {
+            // TODO: In a real app, this would fetch from a database/API
+            // For now, return some mock reviews
+            List<Review> reviews = new ArrayList<>();
+            reviews.add(new Review("1", placeId, "user1", "Great place!", 4.5f));
+            reviews.add(new Review("2", placeId, "user2", "Nice atmosphere", 4.0f));
+            return reviews;
+        });
+    }
 } 
