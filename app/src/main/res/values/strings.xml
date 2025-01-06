@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Student\'s City</string>
+    <string name="filter">Filter</string>
+    <string name="filter_all">All Places</string>
+    <string name="filter_bars">Bars &amp; Clubs</string>
+    <string name="filter_restaurants">Restaurants</string>
+    <string name="filter_cafes">Cafés</string>
 </resources>
