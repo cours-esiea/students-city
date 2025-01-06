@@ -31,6 +31,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
@@ -49,6 +50,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.app.AlertDialog;
 import android.widget.RatingBar;
 import com.google.android.material.textfield.TextInputEditText;
+import android.widget.Button;
+import android.widget.TextView;
 
 public class MapActivity extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
@@ -144,13 +147,48 @@ public class MapActivity extends AppCompatActivity {
         marker.setSnippet(place.getDescription());
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         
-        // Fix the marker click listener
         marker.setOnMarkerClickListener((marker1, mapView) -> {
-            showAddReviewDialog(place);
+            showPlaceDetailsDialog(place);
             return true;
         });
         
         map.getOverlays().add(marker);
+    }
+
+    private void showPlaceDetailsDialog(Place place) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_place_details, null);
+        
+        // Set place details
+        TextView nameText = dialogView.findViewById(R.id.placeName);
+        TextView descriptionText = dialogView.findViewById(R.id.placeDescription);
+        TextView distanceText = dialogView.findViewById(R.id.placeDistance);
+        Button leaveReviewButton = dialogView.findViewById(R.id.leaveReviewButton);
+        
+        nameText.setText(place.getName());
+        descriptionText.setText(place.getDescription());
+        
+        float distance = place.getDistanceToUser();
+        if (distance != Float.MAX_VALUE) {
+            String distanceStr = distance < 1000 
+                ? String.format(Locale.getDefault(), "%.0f m away", distance)
+                : String.format(Locale.getDefault(), "%.1f km away", distance / 1000);
+            distanceText.setText(distanceStr);
+            distanceText.setVisibility(View.VISIBLE);
+        } else {
+            distanceText.setVisibility(View.GONE);
+        }
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        // Set up the leave review button
+        leaveReviewButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            showAddReviewDialog(place);
+        });
+
+        dialog.show();
     }
 
     private void setupLocationCallback() {

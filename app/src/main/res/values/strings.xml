@@ -22,4 +22,5 @@
     <string name="review_submitted">Review submitted for moderation</string>
     <string name="error_empty_review">Please write a review</string>
     <string name="review_metadata_format">By %1$s on %2$s</string>
+    <string name="leave_review">Leave a Review</string>
 </resources>
