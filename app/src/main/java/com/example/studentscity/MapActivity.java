@@ -118,7 +118,9 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void initializeViewModel() {
-        viewModel = new ViewModelProvider(this).get(MapViewModel.class);
+        viewModel = new ViewModelProvider(this, 
+            ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()))
+            .get(MapViewModel.class);
         
         // Update places observer
         viewModel.getPlaces().observe(this, places -> {

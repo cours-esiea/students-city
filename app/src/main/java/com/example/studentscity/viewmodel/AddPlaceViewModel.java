@@ -1,38 +1,44 @@
 package com.example.studentscity.viewmodel;
 
+import android.app.Application;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.studentscity.model.PendingPlace;
-import com.example.studentscity.model.PlaceType;
 import com.example.studentscity.repository.PlacesRepository;
 
-import java.util.UUID;
-
-public class AddPlaceViewModel extends ViewModel {
+public class AddPlaceViewModel extends AndroidViewModel {
     private final PlacesRepository repository;
-    private final MutableLiveData<Boolean> submissionResult = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> submissionSuccess = new MutableLiveData<>();
+    private final MutableLiveData<String> error = new MutableLiveData<>();
 
-    public AddPlaceViewModel() {
-        this.repository = new PlacesRepository();
+    public AddPlaceViewModel(@NonNull Application application) {
+        super(application);
+        this.repository = new PlacesRepository(application);
     }
 
-    public void submitPlace(String name, String description, double latitude,
-                          double longitude, PlaceType type) {
-        String id = UUID.randomUUID().toString();
-        PendingPlace place = new PendingPlace(id, name, description, latitude,
-                longitude, type, "current_user"); // TODO: Add real user management
-
+    public void submitPlace(PendingPlace place) {
         repository.submitPendingPlace(place)
-                .thenAccept(success -> submissionResult.postValue(true))
+                .thenAccept(success -> {
+                    if (success) {
+                        submissionSuccess.postValue(true);
+                    } else {
+                        error.postValue("Failed to submit place");
+                    }
+                })
                 .exceptionally(throwable -> {
-                    submissionResult.postValue(false);
+                    error.postValue("Error: " + throwable.getMessage());
                     return null;
                 });
     }
 
-    public LiveData<Boolean> getSubmissionResult() {
-        return submissionResult;
+    public LiveData<Boolean> getSubmissionSuccess() {
+        return submissionSuccess;
+    }
+
+    public LiveData<String> getError() {
+        return error;
     }
 } 

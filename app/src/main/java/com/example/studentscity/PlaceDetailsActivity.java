@@ -61,7 +61,9 @@ public class PlaceDetailsActivity extends AppCompatActivity {
     }
 
     private void setupViewModel(String placeId) {
-        viewModel = new ViewModelProvider(this).get(PlaceDetailsViewModel.class);
+        viewModel = new ViewModelProvider(this, 
+            ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()))
+            .get(PlaceDetailsViewModel.class);
         viewModel.loadPlace(placeId);
         
         viewModel.getPlace().observe(this, this::updateUI);

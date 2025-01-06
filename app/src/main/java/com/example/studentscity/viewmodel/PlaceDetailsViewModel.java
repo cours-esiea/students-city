@@ -1,8 +1,10 @@
 package com.example.studentscity.viewmodel;
 
+import android.app.Application;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.studentscity.model.Place;
 import com.example.studentscity.model.Review;
@@ -12,14 +14,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.ArrayList;
 
-public class PlaceDetailsViewModel extends ViewModel {
+public class PlaceDetailsViewModel extends AndroidViewModel {
     private final PlacesRepository repository;
     private final MutableLiveData<Place> place = new MutableLiveData<>();
     private final MutableLiveData<List<Review>> reviews = new MutableLiveData<>();
     private String placeId;
 
-    public PlaceDetailsViewModel() {
-        this.repository = new PlacesRepository();
+    public PlaceDetailsViewModel(@NonNull Application application) {
+        super(application);
+        this.repository = new PlacesRepository(application);
     }
 
     public void loadPlace(String placeId) {

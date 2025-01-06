@@ -1,9 +1,11 @@
 package com.example.studentscity.viewmodel;
 
+import android.app.Application;
 import android.location.Location;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.studentscity.model.Place;
 import com.example.studentscity.model.PlaceType;
@@ -14,16 +16,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.UUID;
 
-public class MapViewModel extends ViewModel {
+public class MapViewModel extends AndroidViewModel {
     private final PlacesRepository repository;
     private final MutableLiveData<List<Place>> places = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final MutableLiveData<PlaceType> currentFilter = new MutableLiveData<>();
     private final MutableLiveData<Location> userLocation = new MutableLiveData<>();
-    private List<Place> allPlaces; // Cache all places
+    private List<Place> allPlaces;
 
-    public MapViewModel() {
-        this.repository = new PlacesRepository();
+    public MapViewModel(@NonNull Application application) {
+        super(application);
+        this.repository = new PlacesRepository(application);
         loadPlaces();
     }
 

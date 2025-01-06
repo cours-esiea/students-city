@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.studentscity.model.PendingPlace;
 import com.example.studentscity.model.PlaceType;
 import com.example.studentscity.viewmodel.AddPlaceViewModel;
 import com.google.android.material.textfield.TextInputEditText;
@@ -19,6 +20,8 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+
+import java.util.UUID;
 
 public class AddPlaceActivity extends AppCompatActivity {
     private AddPlaceViewModel viewModel;
@@ -34,7 +37,9 @@ public class AddPlaceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_place);
 
-        viewModel = new ViewModelProvider(this).get(AddPlaceViewModel.class);
+        viewModel = new ViewModelProvider(this, 
+            ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()))
+            .get(AddPlaceViewModel.class);
         
         setupViews();
         setupMap();
@@ -90,7 +95,7 @@ public class AddPlaceActivity extends AppCompatActivity {
     private void submitPlace() {
         String name = nameInput.getText().toString().trim();
         String description = descriptionInput.getText().toString().trim();
-        PlaceType type = (PlaceType) typeSpinner.getSelectedItem();
+        PlaceType selectedType = (PlaceType) typeSpinner.getSelectedItem();
 
         if (name.isEmpty() || description.isEmpty()) {
             Toast.makeText(this, R.string.error_empty_fields, Toast.LENGTH_SHORT).show();
@@ -102,15 +107,32 @@ public class AddPlaceActivity extends AppCompatActivity {
             return;
         }
 
-        viewModel.submitPlace(name, description, selectedLocation.getLatitude(),
-                selectedLocation.getLongitude(), type);
+        // Create a PendingPlace object
+        PendingPlace pendingPlace = new PendingPlace(
+            UUID.randomUUID().toString(),
+            name,
+            description,
+            selectedLocation.getLatitude(),
+            selectedLocation.getLongitude(),
+            selectedType,
+            "current_user" // TODO: Add real user management
+        );
+
+        // Submit the pending place
+        viewModel.submitPlace(pendingPlace);
     }
 
     private void observeViewModel() {
-        viewModel.getSubmissionResult().observe(this, success -> {
+        viewModel.getSubmissionSuccess().observe(this, success -> {
             if (success) {
                 Toast.makeText(this, R.string.place_submitted, Toast.LENGTH_LONG).show();
                 finish();
+            }
+        });
+
+        viewModel.getError().observe(this, errorMessage -> {
+            if (errorMessage != null) {
+                Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
             }
         });
     }
