@@ -122,19 +122,15 @@ public class MapActivity extends AppCompatActivity {
             ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()))
             .get(MapViewModel.class);
         
-        // Update places observer
+        // Observe places LiveData - updates map markers and list when data changes
         viewModel.getPlaces().observe(this, places -> {
             if (isMapView) {
-                map.getOverlays().clear();
-                for (Place place : places) {
-                    addMarker(place);
-                }
-                map.invalidate();
+                updateMapMarkers(places);
             }
             placesAdapter.setPlaces(places);
         });
         
-        // Observe errors
+        // Observe errors - show toast messages when errors occur
         viewModel.getError().observe(this, error -> {
             if (error != null) {
                 Toast.makeText(this, error, Toast.LENGTH_LONG).show();

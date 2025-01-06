@@ -17,19 +17,28 @@ import java.util.stream.Collectors;
 import java.util.UUID;
 
 public class MapViewModel extends AndroidViewModel {
+    // Repository instance to handle data operations
     private final PlacesRepository repository;
+    
+    // LiveData objects to communicate with the UI
+    // Using MutableLiveData internally but exposing as LiveData to views
     private final MutableLiveData<List<Place>> places = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final MutableLiveData<PlaceType> currentFilter = new MutableLiveData<>();
     private final MutableLiveData<Location> userLocation = new MutableLiveData<>();
+    
+    // Cache of all places for filtering
     private List<Place> allPlaces;
 
+    // Constructor injects Application context needed for repository
     public MapViewModel(@NonNull Application application) {
         super(application);
         this.repository = new PlacesRepository(application);
-        loadPlaces();
+        loadPlaces(); // Initial data load
     }
 
+    // Public methods exposed to the View layer
+    // Note: We expose LiveData, not MutableLiveData, for unidirectional data flow
     public LiveData<List<Place>> getPlaces() {
         return places;
     }
@@ -42,12 +51,14 @@ public class MapViewModel extends AndroidViewModel {
         return currentFilter;
     }
 
+    // Business logic for filtering places
     public void setFilter(PlaceType type) {
         currentFilter.setValue(type);
         if (allPlaces != null) {
             if (type == null) {
                 places.setValue(allPlaces);
             } else {
+                // Filter places based on type
                 List<Place> filtered = allPlaces.stream()
                         .filter(place -> place.getType() == type)
                         .collect(Collectors.toList());
@@ -83,6 +94,7 @@ public class MapViewModel extends AndroidViewModel {
         }
     }
 
+    // Private method to load data from repository
     private void loadPlaces() {
         repository.getPlaces()
                 .thenAccept(placesList -> {

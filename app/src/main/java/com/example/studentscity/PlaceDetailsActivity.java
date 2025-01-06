@@ -23,8 +23,10 @@ import android.widget.Toast;
 import java.util.Locale;
 
 public class PlaceDetailsActivity extends AppCompatActivity {
+    // Intent extra key for place ID
     public static final String EXTRA_PLACE_ID = "place_id";
     
+    // ViewModel reference
     private PlaceDetailsViewModel viewModel;
     private ReviewAdapter reviewAdapter;
 
@@ -33,12 +35,14 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_details);
 
+        // Get place ID from intent
         String placeId = getIntent().getStringExtra(EXTRA_PLACE_ID);
         if (placeId == null) {
             finish();
             return;
         }
 
+        // Setup UI components and ViewModel
         setupToolbar();
         setupRecyclerView();
         setupViewModel(placeId);
@@ -61,18 +65,24 @@ public class PlaceDetailsActivity extends AppCompatActivity {
     }
 
     private void setupViewModel(String placeId) {
+        // Create ViewModel using ViewModelProvider
         viewModel = new ViewModelProvider(this, 
             ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication()))
             .get(PlaceDetailsViewModel.class);
+            
+        // Load data for the specific place
         viewModel.loadPlace(placeId);
         
+        // Observe LiveData changes and update UI accordingly
         viewModel.getPlace().observe(this, this::updateUI);
         viewModel.getReviews().observe(this, reviews -> {
             reviewAdapter.setReviews(reviews);
         });
     }
 
+    // UI update method - called when Place LiveData changes
     private void updateUI(Place place) {
+        // Update UI components with place data
         TextView nameText = findViewById(R.id.placeName);
         TextView descriptionText = findViewById(R.id.placeDescription);
         TextView distanceText = findViewById(R.id.placeDistance);
@@ -102,6 +112,7 @@ public class PlaceDetailsActivity extends AppCompatActivity {
         });
     }
 
+    // UI event handler - shows dialog to add review
     private void showAddReviewDialog(Place place) {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_review, null);
         RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);

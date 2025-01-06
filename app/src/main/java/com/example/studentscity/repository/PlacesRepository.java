@@ -22,14 +22,19 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 public class PlacesRepository {
+    // Data access objects for database operations
     private final PlaceDao placeDao;
     private final ReviewDao reviewDao;
+    
+    // Single executor for all database operations
     private final ExecutorService executor;
 
     public PlacesRepository(Context context) {
+        // Initialize Room database and DAOs
         AppDatabase db = AppDatabase.getDatabase(context);
         placeDao = db.placeDao();
         reviewDao = db.reviewDao();
+        // Get shared executor for background operations
         executor = ExecutorProvider.getInstance().getDatabaseExecutor();
         
         initializeSampleData();
@@ -65,8 +70,10 @@ public class PlacesRepository {
         }, executor);
     }
 
+    // Async method to get places, returns CompletableFuture for better threading
     public CompletableFuture<List<Place>> getPlaces() {
         return CompletableFuture.supplyAsync(() -> 
+            // Convert database entities to domain models
             PlaceMapper.toDomainList(placeDao.getAll()),
             executor
         );
@@ -93,9 +100,11 @@ public class PlacesRepository {
         );
     }
 
+    // Async method to submit a review
     public CompletableFuture<Boolean> submitReview(Review review) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                // Convert domain model to database entity and save
                 reviewDao.insert(ReviewMapper.toEntity(review));
                 return true;
             } catch (Exception e) {
