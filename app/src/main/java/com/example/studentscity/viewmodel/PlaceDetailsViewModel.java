@@ -10,6 +10,7 @@ import com.example.studentscity.repository.PlacesRepository;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.ArrayList;
 
 public class PlaceDetailsViewModel extends ViewModel {
     private final PlacesRepository repository;
@@ -35,12 +36,22 @@ public class PlaceDetailsViewModel extends ViewModel {
 
     public void submitReview(String content, float rating) {
         String reviewId = UUID.randomUUID().toString();
-        Review review = new Review(reviewId, placeId, "current_user", content, rating);
+        Review review = new Review(reviewId, placeId, "current_user", content, rating, true);
         
+        // Add the review to the list immediately
+        List<Review> currentReviews = reviews.getValue();
+        if (currentReviews != null) {
+            List<Review> updatedReviews = new ArrayList<>(currentReviews);
+            updatedReviews.add(0, review); // Add at the beginning of the list
+            reviews.setValue(updatedReviews);
+        }
+        
+        // Submit to repository
         repository.submitReview(review)
                 .thenAccept(success -> {
-                    if (success) {
-                        loadReviews(); // Refresh reviews after submission
+                    if (!success) {
+                        // If submission fails, reload reviews to remove the pending one
+                        loadReviews();
                     }
                 });
     }

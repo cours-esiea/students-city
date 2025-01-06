@@ -9,14 +9,14 @@ public class Review {
     private long timestamp;
     private boolean isPending;
 
-    public Review(String id, String placeId, String authorId, String content, float rating) {
+    public Review(String id, String placeId, String authorId, String content, float rating, boolean isPending) {
         this.id = id;
         this.placeId = placeId;
         this.authorId = authorId;
         this.content = content;
         this.rating = rating;
         this.timestamp = System.currentTimeMillis();
-        this.isPending = true;
+        this.isPending = isPending;
     }
 
     // Getters

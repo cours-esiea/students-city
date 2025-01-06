@@ -26,4 +26,5 @@
     <string name="view_details">View Details</string>
     <string name="reviews">Reviews</string>
     <string name="place_details">Place Details</string>
+    <string name="pending_review">Pending Approval</string>
 </resources>

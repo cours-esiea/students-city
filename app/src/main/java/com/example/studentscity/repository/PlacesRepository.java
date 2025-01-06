@@ -71,8 +71,8 @@ public class PlacesRepository {
             // TODO: In a real app, this would fetch from a database/API
             // For now, return some mock reviews
             List<Review> reviews = new ArrayList<>();
-            reviews.add(new Review("1", placeId, "user1", "Great place!", 4.5f));
-            reviews.add(new Review("2", placeId, "user2", "Nice atmosphere", 4.0f));
+            reviews.add(new Review("1", placeId, "user1", "Great place!", 4.5f, false));
+            reviews.add(new Review("2", placeId, "user2", "Nice atmosphere", 4.0f, false));
             return reviews;
         });
     }

@@ -100,13 +100,11 @@ public class MapViewModel extends ViewModel {
 
     public void submitReview(String placeId, String content, float rating) {
         String reviewId = UUID.randomUUID().toString();
-        Review review = new Review(reviewId, placeId, "current_user", content, rating);
+        Review review = new Review(reviewId, placeId, "current_user", content, rating, true);
         
         repository.submitReview(review)
                 .thenAccept(success -> {
-                    if (success) {
-                        // Optionally refresh the place details to show pending review
-                    }
+                    // Handle success/failure if needed
                 });
     }
 } 

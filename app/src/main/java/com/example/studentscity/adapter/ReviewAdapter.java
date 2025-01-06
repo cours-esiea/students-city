@@ -66,6 +66,16 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             String metadata = itemView.getContext().getString(
                 R.string.review_metadata_format, "Anonymous", date);
             reviewMetadata.setText(metadata);
+
+            // Show pending badge for pending reviews
+            TextView pendingBadge = itemView.findViewById(R.id.pendingBadge);
+            if (review.isPending()) {
+                pendingBadge.setVisibility(View.VISIBLE);
+                itemView.setAlpha(0.8f); // Make the whole item slightly transparent
+            } else {
+                pendingBadge.setVisibility(View.GONE);
+                itemView.setAlpha(1.0f);
+            }
         }
     }
 } 

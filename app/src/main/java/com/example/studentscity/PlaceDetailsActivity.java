@@ -101,7 +101,6 @@ public class PlaceDetailsActivity extends AppCompatActivity {
     }
 
     private void showAddReviewDialog(Place place) {
-        // Reuse the existing review dialog from MapActivity
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_review, null);
         RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);
         TextInputEditText reviewInput = dialogView.findViewById(R.id.reviewInput);
@@ -117,6 +116,8 @@ public class PlaceDetailsActivity extends AppCompatActivity {
                         return;
                     }
                     viewModel.submitReview(content, ratingBar.getRating());
+                    Toast.makeText(this, R.string.review_submitted, 
+                        Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
