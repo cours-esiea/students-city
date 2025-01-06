@@ -3,6 +3,7 @@ package com.example.studentscity;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -31,6 +32,12 @@ import java.util.ArrayList;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
 public class MapActivity extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;
@@ -39,6 +46,11 @@ public class MapActivity extends AppCompatActivity {
     // Center of Dax, France
     private static final GeoPoint DAX_CENTER = new GeoPoint(43.7102, -1.0536);
     private static final double DEFAULT_ZOOM = 15.0;
+
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
+    private boolean locationPermissionGranted = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,6 +75,10 @@ public class MapActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        setupLocationCallback();
+        getLocationPermission();
     }
 
     private void initializeMap() {
@@ -105,15 +121,77 @@ public class MapActivity extends AppCompatActivity {
         map.getOverlays().add(marker);
     }
 
+    private void setupLocationCallback() {
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                Location location = locationResult.getLastLocation();
+                if (location != null) {
+                    viewModel.updateUserLocation(location);
+                }
+            }
+        };
+    }
+
+    private void getLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true;
+            startLocationUpdates();
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    private void startLocationUpdates() {
+        if (!locationPermissionGranted) {
+            return;
+        }
+
+        LocationRequest locationRequest = LocationRequest.create()
+                .setInterval(10000)
+                .setFastestInterval(5000)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.requestLocationUpdates(locationRequest,
+                    locationCallback,
+                    null);
+        }
+    }
+
     @Override
-    public void onResume() {
+    public void onRequestPermissionsResult(int requestCode,
+                                         @NonNull String[] permissions,
+                                         @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        locationPermissionGranted = false;
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationPermissionGranted = true;
+                startLocationUpdates();
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
         super.onResume();
+        if (locationPermissionGranted) {
+            startLocationUpdates();
+        }
         map.onResume();
     }
 
     @Override
-    public void onPause() {
+    protected void onPause() {
         super.onPause();
+        fusedLocationClient.removeLocationUpdates(locationCallback);
         map.onPause();
     }
 

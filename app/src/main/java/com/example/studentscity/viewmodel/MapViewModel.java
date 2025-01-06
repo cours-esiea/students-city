@@ -1,5 +1,6 @@
 package com.example.studentscity.viewmodel;
 
+import android.location.Location;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -16,6 +17,7 @@ public class MapViewModel extends ViewModel {
     private final MutableLiveData<List<Place>> places = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
     private final MutableLiveData<PlaceType> currentFilter = new MutableLiveData<>();
+    private final MutableLiveData<Location> userLocation = new MutableLiveData<>();
     private List<Place> allPlaces; // Cache all places
 
     public MapViewModel() {
@@ -46,6 +48,33 @@ public class MapViewModel extends ViewModel {
                         .collect(Collectors.toList());
                 places.setValue(filtered);
             }
+        }
+    }
+
+    public void updateUserLocation(Location location) {
+        userLocation.setValue(location);
+        updatePlacesWithDistance(location);
+    }
+
+    private void updatePlacesWithDistance(Location location) {
+        if (allPlaces != null) {
+            // Update distances
+            allPlaces.forEach(place -> place.calculateDistanceToUser(location));
+            
+            // Sort by distance
+            List<Place> sortedPlaces = allPlaces.stream()
+                    .sorted((p1, p2) -> Float.compare(p1.getDistanceToUser(), p2.getDistanceToUser()))
+                    .collect(Collectors.toList());
+            
+            // Apply current filter if exists
+            PlaceType filter = currentFilter.getValue();
+            if (filter != null) {
+                sortedPlaces = sortedPlaces.stream()
+                        .filter(place -> place.getType() == filter)
+                        .collect(Collectors.toList());
+            }
+            
+            places.setValue(sortedPlaces);
         }
     }
 
