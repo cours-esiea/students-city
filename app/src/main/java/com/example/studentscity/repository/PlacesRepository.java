@@ -24,6 +24,10 @@ public class PlacesRepository {
             places.add(new Place("3", "Le QG", 
                     "Trendy bar with student nights", 
                     43.7090, -1.0550, PlaceType.BAR));
+
+            places.add(new Place("3", "La plage",
+                    "Beer & Sand",
+                    43.6090, -1.0550, PlaceType.BAR));
             
             places.add(new Place("4", "Bibliothèque Municipale", 
                     "Quiet study spot with free WiFi", 
