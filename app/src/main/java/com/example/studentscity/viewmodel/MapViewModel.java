@@ -8,9 +8,11 @@ import androidx.lifecycle.ViewModel;
 import com.example.studentscity.model.Place;
 import com.example.studentscity.model.PlaceType;
 import com.example.studentscity.repository.PlacesRepository;
+import com.example.studentscity.model.Review;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 public class MapViewModel extends ViewModel {
     private final PlacesRepository repository;
@@ -93,6 +95,18 @@ public class MapViewModel extends ViewModel {
                 .exceptionally(throwable -> {
                     error.postValue("Failed to load places: " + throwable.getMessage());
                     return null;
+                });
+    }
+
+    public void submitReview(String placeId, String content, float rating) {
+        String reviewId = UUID.randomUUID().toString();
+        Review review = new Review(reviewId, placeId, "current_user", content, rating);
+        
+        repository.submitReview(review)
+                .thenAccept(success -> {
+                    if (success) {
+                        // Optionally refresh the place details to show pending review
+                    }
                 });
     }
 } 

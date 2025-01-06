@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -45,6 +46,9 @@ import com.example.studentscity.adapter.PlacesAdapter;
 
 import android.content.Intent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import android.app.AlertDialog;
+import android.widget.RatingBar;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class MapActivity extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
@@ -139,6 +143,13 @@ public class MapActivity extends AppCompatActivity {
         marker.setTitle(place.getName());
         marker.setSnippet(place.getDescription());
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        
+        // Fix the marker click listener
+        marker.setOnMarkerClickListener((marker1, mapView) -> {
+            showAddReviewDialog(place);
+            return true;
+        });
+        
         map.getOverlays().add(marker);
     }
 
@@ -280,5 +291,26 @@ public class MapActivity extends AppCompatActivity {
             Intent intent = new Intent(this, AddPlaceActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void showAddReviewDialog(Place place) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_review, null);
+        RatingBar ratingBar = dialogView.findViewById(R.id.ratingBar);
+        TextInputEditText reviewInput = dialogView.findViewById(R.id.reviewInput);
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.write_review))
+                .setView(dialogView)
+                .setPositiveButton(R.string.submit, (dialog, which) -> {
+                    String content = reviewInput.getText().toString().trim();
+                    if (content.isEmpty()) {
+                        Toast.makeText(this, R.string.error_empty_review, 
+                            Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    viewModel.submitReview(place.getId(), content, ratingBar.getRating());
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 }

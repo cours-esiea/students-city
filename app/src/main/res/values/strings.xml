@@ -15,4 +15,11 @@
     <string name="place_submitted">Place submitted for moderation</string>
     <string name="error_empty_fields">Please fill all fields</string>
     <string name="error_no_location">Please select a location on the map</string>
+    <string name="write_review">Write Review</string>
+    <string name="write_your_review">Write your review here…</string>
+    <string name="submit">Submit</string>
+    <string name="cancel">Cancel</string>
+    <string name="review_submitted">Review submitted for moderation</string>
+    <string name="error_empty_review">Please write a review</string>
+    <string name="review_metadata_format">By %1$s on %2$s</string>
 </resources>
