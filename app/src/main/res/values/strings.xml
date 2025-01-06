@@ -6,4 +6,13 @@
     <string name="filter_restaurants">Restaurants</string>
     <string name="filter_cafes">Cafés</string>
     <string name="toggle_view">Toggle View</string>
+    <string name="add_new_place">Add New Place</string>
+    <string name="place_name">Place Name</string>
+    <string name="place_description">Description</string>
+    <string name="tap_map_location">Tap on the map to set location</string>
+    <string name="submit_place">Submit Place</string>
+    <string name="pending_moderation">Pending Moderation</string>
+    <string name="place_submitted">Place submitted for moderation</string>
+    <string name="error_empty_fields">Please fill all fields</string>
+    <string name="error_no_location">Please select a location on the map</string>
 </resources>

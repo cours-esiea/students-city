@@ -2,6 +2,7 @@ package com.example.studentscity.repository;
 
 import com.example.studentscity.model.Place;
 import com.example.studentscity.model.PlaceType;
+import com.example.studentscity.model.PendingPlace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,14 @@ public class PlacesRepository {
                     43.7115, -1.0545, PlaceType.LIBRARY));
             
             return places;
+        });
+    }
+
+    public CompletableFuture<Boolean> submitPendingPlace(PendingPlace place) {
+        return CompletableFuture.supplyAsync(() -> {
+            // TODO: Implement actual API call to submit pending place
+            // For now, just simulate success
+            return true;
         });
     }
 } 

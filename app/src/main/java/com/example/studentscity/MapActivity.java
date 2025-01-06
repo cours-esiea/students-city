@@ -43,6 +43,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.studentscity.adapter.PlacesAdapter;
 
+import android.content.Intent;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 public class MapActivity extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;
@@ -92,6 +95,8 @@ public class MapActivity extends AppCompatActivity {
 
         viewFlipper = findViewById(R.id.viewFlipper);
         setupRecyclerView();
+
+        setupFab();
     }
 
     private void initializeMap() {
@@ -267,5 +272,13 @@ public class MapActivity extends AppCompatActivity {
         placesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         placesAdapter = new PlacesAdapter();
         placesRecyclerView.setAdapter(placesAdapter);
+    }
+
+    private void setupFab() {
+        FloatingActionButton fab = findViewById(R.id.addPlaceFab);
+        fab.setOnClickListener(view -> {
+            Intent intent = new Intent(this, AddPlaceActivity.class);
+            startActivity(intent);
+        });
     }
 }
