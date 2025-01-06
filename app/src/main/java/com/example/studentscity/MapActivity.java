@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -38,6 +39,10 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.studentscity.adapter.PlacesAdapter;
+
 public class MapActivity extends AppCompatActivity {
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
     private MapView map = null;
@@ -51,6 +56,11 @@ public class MapActivity extends AppCompatActivity {
     private LocationCallback locationCallback;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private boolean locationPermissionGranted = false;
+
+    private ViewFlipper viewFlipper;
+    private RecyclerView placesRecyclerView;
+    private PlacesAdapter placesAdapter;
+    private boolean isMapView = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,6 +89,9 @@ public class MapActivity extends AppCompatActivity {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         setupLocationCallback();
         getLocationPermission();
+
+        viewFlipper = findViewById(R.id.viewFlipper);
+        setupRecyclerView();
     }
 
     private void initializeMap() {
@@ -95,13 +108,16 @@ public class MapActivity extends AppCompatActivity {
     private void initializeViewModel() {
         viewModel = new ViewModelProvider(this).get(MapViewModel.class);
         
-        // Observe places
+        // Update places observer
         viewModel.getPlaces().observe(this, places -> {
-            map.getOverlays().clear();
-            for (Place place : places) {
-                addMarker(place);
+            if (isMapView) {
+                map.getOverlays().clear();
+                for (Place place : places) {
+                    addMarker(place);
+                }
+                map.invalidate();
             }
-            map.invalidate(); // Refresh map
+            placesAdapter.setPlaces(places);
         });
         
         // Observe errors
@@ -233,8 +249,23 @@ public class MapActivity extends AppCompatActivity {
         } else if (id == R.id.filter_cafes) {
             viewModel.setFilter(PlaceType.CAFE);
             return true;
+        } else if (id == R.id.toggle_view) {
+            toggleView();
+            return true;
         }
         
         return super.onOptionsItemSelected(item);
+    }
+
+    private void toggleView() {
+        isMapView = !isMapView;
+        viewFlipper.setDisplayedChild(isMapView ? 0 : 1);
+    }
+
+    private void setupRecyclerView() {
+        placesRecyclerView = findViewById(R.id.placesRecyclerView);
+        placesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        placesAdapter = new PlacesAdapter();
+        placesRecyclerView.setAdapter(placesAdapter);
     }
 }
