@@ -31,6 +31,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -136,6 +137,19 @@ public class MapActivity extends AppCompatActivity {
                 Toast.makeText(this, error, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void updateMapMarkers(List<Place> places) {
+        // Clear existing markers
+        map.getOverlays().clear();
+        
+        // Add new markers for each place
+        for (Place place : places) {
+            addMarker(place);
+        }
+        
+        // Refresh the map
+        map.invalidate();
     }
 
     private void addMarker(Place place) {
